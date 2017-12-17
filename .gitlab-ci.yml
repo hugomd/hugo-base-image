@@ -1,0 +1,22 @@
+image: docker:latest
+
+variables:
+  DOCKER_DRIVER: overlay
+
+services:
+  - docker:dind
+
+stages:
+  - push
+
+push:
+  stage: push
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN reg.g.hu.md
+    - version=`cat VERSION`
+    - docker build -t reg.g.hu.md/hugo/now-hugo-image .
+    - docker tag reg.g.hu.md/hugo/now-hugo-image reg.g.hu.md/hugo/now-hugo-image:$version
+    - docker push reg.g.hu.md/hugo/now-hugo-image:latest
+    - docker push reg.g.hu.md/hugo/now-hugo-image:$version
+  only:
+    - master
